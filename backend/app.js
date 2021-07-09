@@ -2,6 +2,19 @@ const express = require("express");
 const app = express();
 const port = 3000;
 
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PATCH, DELETE, OPTIONS"
+  );
+  next();
+});
+
 app.use("/api/posts", (req, res, next) => {
   const posts = [
     {
@@ -16,8 +29,8 @@ app.use("/api/posts", (req, res, next) => {
     },
   ];
   return res.status(200).json({
-      message: 'Posts featched succesfully!',
-      posts: posts
+    message: "Posts featched succesfully!",
+    posts: posts,
   });
 });
 module.exports = app;
