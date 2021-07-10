@@ -1,8 +1,15 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const Post = require("./models/post");
+const mongoos = require('mongoose');
+
 
 const app = express();
+mongoos.connect('mongodb://localhost:27017/MiniSocial').then(()=>{
+  console.log('Connected to database!');
+}).catch(()=>{
+  console.log('connect faild');
+})
 
 const port = 3000;
 
@@ -27,6 +34,7 @@ app.post("/api/posts", (req, res, next) => {
     title: req.body.title,
     content: req.body.content
   });
+  post.save();
   console.log(post);
   res.status(201).json({
     message: "Post added sucessfully!",
