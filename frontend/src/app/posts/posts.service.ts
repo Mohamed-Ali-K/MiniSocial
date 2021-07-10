@@ -18,13 +18,15 @@ export class PostsService {
       .pipe(
         take(1),
         map((postData) => {
-          return postData.posts.map((post: { title: any; content: any; _id: any; }) => {
-            return {
-              title: post.title,
-              content: post.content,
-              id: post._id,
-            };
-          });
+          return postData.posts.map(
+            (post: any) => {
+              return {
+                title: post.title,
+                content: post.content,
+                id: post._id,
+              };
+            }
+          );
         })
       )
       .subscribe((transformedPosts) => {
@@ -46,8 +48,20 @@ export class PostsService {
       )
       .subscribe((resData) => {
         console.log(resData);
+        console.log(post);
+
         this.posts.push(post);
         this.postUpdated.next([...this.posts]);
+      });
+  }
+
+  deletePost(postId: string) {
+    this.http
+      .delete('http://localhost:3000/api/posts/' + postId)
+      .subscribe(() => {
+       const updatedPosts= this.posts.filter(post => post.id !== postId);
+       this.posts = updatedPosts;
+       this.postUpdated.next([...this.posts]);
       });
   }
 }

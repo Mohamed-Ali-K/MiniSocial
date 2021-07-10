@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Post } from '../post.model';
@@ -19,6 +20,10 @@ export class PostListComponent implements OnInit, OnDestroy{
       this.posts = posts;
     });
   }
+  onDelete(postId: string) {
+    this.PostService.deletePost(postId);
+  }
+
   ngOnDestroy () {
     this.postSub.unsubscribe();
   }
