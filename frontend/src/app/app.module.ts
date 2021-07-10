@@ -17,6 +17,7 @@ import { PostListComponent } from './posts/post-list/post-list.component';
 import {MatExpansionModule} from '@angular/material/expansion';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { AppRoutingModule } from './app-routing.module';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { HttpClientModule } from '@angular/common/http';
   ],
   imports: [
     FormsModule,
+    AppRoutingModule,
     BrowserModule,
     BrowserAnimationsModule,
     MatCardModule,
