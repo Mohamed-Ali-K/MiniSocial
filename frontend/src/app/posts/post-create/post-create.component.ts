@@ -11,6 +11,7 @@ import { PostsService } from '../posts.service';
 })
 export class PostCreateComponent implements OnInit {
   post: Post;
+  isLoading = false;
   private mode = 'create';
   private postId: string;
 
@@ -24,7 +25,9 @@ export class PostCreateComponent implements OnInit {
       if (paramMap.has('postId')) {
         this.mode = 'edit';
         this.postId = paramMap.get('postId');
+        this.isLoading= true;
         this.postService.getPost(this.postId).subscribe(postData =>{
+          this.isLoading=false;
           this.post= {id:postData._id, title: postData.title, content: postData.content}
         });
 
@@ -39,6 +42,7 @@ export class PostCreateComponent implements OnInit {
       return;
     }
     if (this.mode==='create') {
+      this.isLoading= true;
       this.postService.addPost(postForm.value.title, postForm.value.content);
     }else {
       this.postService.updatePost(this.postId, postForm.value.title, postForm.value.content);
