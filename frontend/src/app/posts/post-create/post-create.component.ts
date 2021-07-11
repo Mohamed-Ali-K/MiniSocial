@@ -1,5 +1,5 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Post } from '../post.model';
 import { PostsService } from '../posts.service';
@@ -12,6 +12,7 @@ import { PostsService } from '../posts.service';
 export class PostCreateComponent implements OnInit {
   post: Post;
   isLoading = false;
+  form: FormGroup;
   private mode = 'create';
   private postId: string;
 
@@ -21,33 +22,55 @@ export class PostCreateComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.form = new FormGroup({
+      title: new FormControl(null, {
+        updateOn: 'blur',
+        validators: [Validators.required],
+      }),
+      content: new FormControl(null, {
+        updateOn: 'blur',
+        validators: [Validators.required, Validators.maxLength(180)],
+      }),
+    });
+
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
       if (paramMap.has('postId')) {
         this.mode = 'edit';
         this.postId = paramMap.get('postId');
-        this.isLoading= true;
-        this.postService.getPost(this.postId).subscribe(postData =>{
-          this.isLoading=false;
-          this.post= {id:postData._id, title: postData.title, content: postData.content}
+        this.isLoading = true;
+        this.postService.getPost(this.postId).subscribe((postData) => {
+          this.isLoading = false;
+          this.post = {
+            id: postData._id,
+            title: postData.title,
+            content: postData.content,
+          };
+          this.form.setValue({
+            title: this.post.title,
+            content: this.post.content,
+          });
         });
-
       } else {
         this.mode = 'create';
         this.postId = null;
       }
     });
   }
-  onSavePost(postForm: NgForm) {
-    if (postForm.invalid) {
+  onSavePost() {
+    if (!this.form.valid ) {
       return;
     }
-    if (this.mode==='create') {
-      this.isLoading= true;
-      this.postService.addPost(postForm.value.title, postForm.value.content);
-    }else {
-      this.postService.updatePost(this.postId, postForm.value.title, postForm.value.content);
+    this.isLoading = true;
+    if (this.mode === 'create') {
+      this.postService.addPost(this.form.value.title, this.form.value.content);
+      console.log(this.form.value.title, this.form.value.content);
+    } else {
+      this.postService.updatePost(
+        this.postId,
+        this.form.value.title,
+        this.form.value.content
+      );
     }
-    postForm.resetForm();
-
+    this.form.reset();
   }
 }

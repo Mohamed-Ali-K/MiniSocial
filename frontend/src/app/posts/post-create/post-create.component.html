@@ -1,34 +1,26 @@
 <mat-card>
   <mat-spinner *ngIf="isLoading"></mat-spinner>
-  <form *ngIf="!isLoading" (submit)="onSavePost(postForm)" #postForm="ngForm">
+  <form [formGroup]="form" *ngIf="!isLoading" (submit)="onSavePost()">
     <mat-form-field>
       <mat-label>Leave a Title </mat-label>
-      <input
-        matInput
-        type="text"
-        [ngModel]="post?.title"
-        #title="ngModel"
-        name="title"
-        required
-      />
-      <mat-error *ngIf="title.invalid">Please enter a Post Contnet</mat-error>
+      <input matInput type="text" formControlName="title" />
+      <mat-error *ngIf="!form.get('title').valid && form.get('title').touched">
+        Please enter a Post Contnet
+      </mat-error>
     </mat-form-field>
     <div>
-      <button mat-stroked-button type="button" (click)="filePicker.click()" >Pick Image</button>
-      <input #filePicker type="file" >
+      <button mat-stroked-button type="button" (click)="filePicker.click()">
+        Pick Image
+      </button>
+      <input #filePicker type="file" />
     </div>
     <mat-form-field class="example-full-width" appearance="fill">
       <mat-label>Leave a Post </mat-label>
-      <textarea
-        matInput
-        rows="4"
-        [ngModel]="post?.content"
-        name="content"
-        #content="ngModel"
-        required
-      ></textarea>
-      <mat-error *ngIf="title.invalid">Please enter a Post Contnet</mat-error>
+      <textarea matInput rows="4" formControlName="content"> </textarea>
+      <mat-error *ngIf="!form.get('content').valid && form.get('content').touched">
+        Please enter a Post Contnet
+      </mat-error>
     </mat-form-field>
-    <button type="submit" mat-raised-button color="primary">Primary</button>
+    <button type="submit" mat-raised-button color="primary">Save Post</button>
   </form>
 </mat-card>
