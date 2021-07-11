@@ -27,6 +27,7 @@ export class PostsService {
               title: post.title,
               content: post.content,
               id: post._id,
+              imagePath: post.imagePath
             };
           });
         })
@@ -50,21 +51,21 @@ export class PostsService {
     postData.append('content', content);
     postData.append('image', image, title);
     this.http
-      .post<{ message: string; post: Post[]; postId: string }>(
+      .post<{ message: string; post: Post }>(
         'http://localhost:3000/api/posts',
         postData
       )
       .subscribe((resData) => {
-        const post: Post = {id: resData.postId, title: title, content: content};
-        const id = resData.postId;
+        const post: Post = {id: resData.post.id, title: title, content: content, imagePath: resData.post.imagePath};
+        const id = resData.post.id;
         post.id = id;
         this.posts.push(post);
         this.postUpdated.next([...this.posts]);
         this.router.navigate(['/']);
       });
   }
-  updatePost(id : string, title: string, content: string ) {
-    const post: Post = {id, title, content};
+  updatePost(id : string, title: string, content: string, ) {
+    const post: Post = {id, title, content, imagePath: null};
     this.http.put('http://localhost:3000/api/posts/' + id, post).subscribe(response =>{
       const updatedPost= [...this.posts];
       const oldPostIndex= updatedPost.findIndex(p => p.id===post.id);
