@@ -14,6 +14,9 @@
       </button>
       <input #filePicker type="file" (change)="onImagePicked($event)" />
     </div>
+    <div class="image-preview" *ngIf="imagePreview !== '' && imagePreview " >
+      <img [src]="imagePreview" [alt]="form.value.title">
+    </div>
     <mat-form-field class="example-full-width" appearance="fill">
       <mat-label>Leave a Post </mat-label>
       <textarea matInput rows="4" formControlName="content"> </textarea>
