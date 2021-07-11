@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
     if (isValid) {
       error = null;
     }
-    cb(error, "/images")
+    cb(error, "./images")
   },
   filename: (req, file, cb) => {
     const name = file.originalname.toLocaleLowerCase().split(' ').join('-');
@@ -29,7 +29,7 @@ const storage = multer.diskStorage({
 
 
 
-router.post("",multer(storage).single("image"), (req, res, next) => {
+router.post("",multer({storage: storage}).single("image"), (req, res, next) => {
   const post = new Post({
     title: req.body.title,
     content: req.body.content,
