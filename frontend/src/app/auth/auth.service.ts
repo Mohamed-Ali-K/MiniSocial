@@ -7,6 +7,7 @@ import { AuthData } from './auth-data.model';
   providedIn: 'root',
 })
 export class AuthService {
+  private IsAuthenticated = false;
   private token: string;
   private authStatusListener = new Subject<boolean>();
   constructor(private http: HttpClient) {}
@@ -16,6 +17,9 @@ export class AuthService {
   }
   getAuthStatusListener () {
     return this.authStatusListener.asObservable();
+  }
+  getIsAuth () {
+    return this.IsAuthenticated;
   }
   creatUser(email: string, password: string) {
     const authData: AuthData = {
@@ -39,7 +43,10 @@ export class AuthService {
       .subscribe((response) => {
         const token = response.token;
         this.token = token;
-        this.authStatusListener.next(true);
+        if (token) {
+          this.IsAuthenticated = true;
+          this.authStatusListener.next(true);
+        }
       });
   }
 }
