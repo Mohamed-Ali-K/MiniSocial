@@ -79,8 +79,14 @@ router.get("/:id", (req, res, next) => {
     }
   });
 });
-router.use("", (req, res, next) => {
-  Post.find().then((documents) => {
+router.get("", (req, res, next) => {
+  const pageSize = +req.query.pageSize;
+  const currentPage = +req.query.page;
+  const postQuery=Post.find();
+  if (pageSize && currentPage) {
+    postQuery.skip(pageSize * (currentPage - 1 )).limit(pageSize)
+  }
+  postQuery.then((documents) => {
     return res.status(200).json({
       message: "Posts featched succesfully!",
       posts: documents,
