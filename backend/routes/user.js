@@ -28,6 +28,7 @@ router.post("/signup", (req, res, next) => {
   });
 });
 router.post("/login", (req, res, next) => {
+  let fetchedUser;
   User.findOne({ email: req.body.email })
     .then((user) => {
       if (!user) {
@@ -35,7 +36,8 @@ router.post("/login", (req, res, next) => {
           message: "Auth failed",
         });
       }
-      bcrypt.compare(req.body.password, user.password);
+      fetchedUser = user;
+      return bcrypt.compare(req.body.password, user.password);
     })
     .then((result) => {
       if (!result) {
@@ -44,12 +46,16 @@ router.post("/login", (req, res, next) => {
         });
       }
       const token = jsonwebtoken.sign(
-        { email: user.email, userId: user._id },
+        { email: fetchedUser.email, userId: fetchedUser._id },
         "secret_this_should_be_longer",
         {
           expiresIn: "1h",
         }
       );
+      res.status(200).json({
+        message: "login succied !",
+        token: token,
+      });
     })
     .catch((err) => {
       return res.status(501).json({
