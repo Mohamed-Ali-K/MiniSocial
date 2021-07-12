@@ -89,15 +89,22 @@ router.get("", (req, res, next) => {
   const pageSize = +req.query.pagesize;
   const currentPage = +req.query.page;
   const postQuery = Post.find();
+  let featchedPost;
   if (pageSize && currentPage) {
     postQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
   }
-  postQuery.then((documents) => {
-    return res.status(200).json({
-      message: "Posts featched succesfully!",
-      posts: documents,
+  postQuery
+    .then((documents) => {
+      featchedPost = documents;
+      return Post.countDocuments();
+    })
+    .then((count) => {
+      res.status(200).json({
+        message: "Posts featched succesfully!",
+        posts: featchedPost,
+        maxPost: count,
+      });
     });
-  });
 });
 
 module.exports = router;
