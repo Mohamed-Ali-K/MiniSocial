@@ -1,0 +1,18 @@
+input.example-right-align::-webkit-outer-spin-button,
+input.example-right-align::-webkit-inner-spin-button {
+  display: none;
+}
+
+input.example-right-align {
+  -moz-appearance: textfield;
+}
+
+mat-form-field{
+  width: 100%;
+}
+
+mat-spinner {
+  margin: auto;
+  padding: auto;
+}
+
