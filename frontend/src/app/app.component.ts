@@ -12,5 +12,4 @@ constructor(private authService: AuthService) {}
 ngOnInit () {
 this.authService.autoAuthUser();
 }
-  // }
-}
+

@@ -40,6 +40,7 @@ router.post(
       creator: req.UserData.userId
     });
     post.save().then((createdPost) => {
+      console.log(createdPost);
       res.status(201).json({
         message: "Post added sucessfully!",
         post: {
@@ -51,9 +52,13 @@ router.post(
   }
 );
 router.delete("/:id", checkAuth, (req, res, next) => {
-  Post.deleteOne({ _id: req.params.id }).then((result) => {
+  Post.deleteOne({ _id: req.params.id, creator: req.UserData.userId  }).then((result) => {
     console.log(result);
-    res.status(200).json({ message: "Post deleted!" });
+    if (result.deletedCount >0 ) {
+      res.status(200).json({ message: "Post Deleted!" });
+    } else {
+      res.status(401).json({ message: "Not authorize !" });
+    }
   });
 });
 
@@ -72,8 +77,14 @@ router.put(
       content: req.body.content,
       imagePath: imagePath,
     });
-    Post.updateOne({ _id: req.params.id }, post).then((result) => {
-      res.status(200).json({ message: "Post Updated!" });
+    Post.updateOne({ _id: req.params.id, creator: req.UserData.userId }, post).then((result) => {
+      console.log(result);
+      if (result.nModified >0 ) {
+        res.status(200).json({ message: "Post Updated!" });
+      } else {
+        res.status(401).json({ message: "Not authorize !" });
+      }
+     
     });
   }
 );
