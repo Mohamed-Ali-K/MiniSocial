@@ -26,6 +26,7 @@ import { LoginComponent } from './auth/login/login.component';
 import { SignupComponent } from './auth/signup/signup.component';
 import { AuthInterceptor } from './auth/auth-interceptor';
 import { ErroInterceptor } from './erro.interceptor';
+import { ErroComponent } from './erro/erro/erro.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { ErroInterceptor } from './erro.interceptor';
     PostListComponent,
     LoginComponent,
     SignupComponent,
+    ErroComponent,
   ],
   imports: [
     ReactiveFormsModule,
@@ -61,5 +63,6 @@ import { ErroInterceptor } from './erro.interceptor';
     { provide: HTTP_INTERCEPTORS, useClass: ErroInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
+  entryComponents: [ErroComponent]
 })
 export class AppModule {}
