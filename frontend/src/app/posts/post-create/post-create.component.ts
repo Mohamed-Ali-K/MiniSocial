@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { AuthService } from 'src/app/auth/auth.service';
 import { Post } from '../post.model';
 import { PostsService } from '../posts.service';
 import { mimeType } from './mime-type.validator';
@@ -10,20 +12,25 @@ import { mimeType } from './mime-type.validator';
   templateUrl: './post-create.component.html',
   styleUrls: ['./post-create.component.css'],
 })
-export class PostCreateComponent implements OnInit {
+export class PostCreateComponent implements OnInit, OnDestroy {
   post: Post;
   isLoading = false;
   form: FormGroup;
   imagePreview: string;
+  private authStatusSub: Subscription;
   private mode = 'create';
   private postId: string;
 
   constructor(
     private postService: PostsService,
-    public route: ActivatedRoute
+    public route: ActivatedRoute,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    this.authStatusSub = this.authService
+      .getAuthStatusListener()
+      .subscribe((authSatus) => (this.isLoading = false));
     this.form = new FormGroup({
       title: new FormControl(null, {
         updateOn: 'blur',
@@ -34,7 +41,8 @@ export class PostCreateComponent implements OnInit {
         validators: [Validators.required, Validators.maxLength(180)],
       }),
       image: new FormControl(null, {
-        validators: [Validators.required], asyncValidators: [mimeType]
+        validators: [Validators.required],
+        asyncValidators: [mimeType],
       }),
     });
 
@@ -50,12 +58,12 @@ export class PostCreateComponent implements OnInit {
             title: postData.title,
             content: postData.content,
             imagePath: postData.imagePath,
-            creator: postData.creator
+            creator: postData.creator,
           };
           this.form.setValue({
             title: this.post.title,
             content: this.post.content,
-            image: this.post.imagePath
+            image: this.post.imagePath,
           });
         });
       } else {
@@ -65,13 +73,16 @@ export class PostCreateComponent implements OnInit {
     });
   }
   onSavePost() {
-    if (!this.form.valid ) {
+    if (!this.form.valid) {
       return;
     }
     this.isLoading = true;
     if (this.mode === 'create') {
-      this.postService.addPost(this.form.value.title, this.form.value.content, this.form.value.image);
-
+      this.postService.addPost(
+        this.form.value.title,
+        this.form.value.content,
+        this.form.value.image
+      );
     } else {
       this.postService.updatePost(
         this.postId,
@@ -84,12 +95,15 @@ export class PostCreateComponent implements OnInit {
   }
   onImagePicked(event: Event) {
     const file = (event.target as HTMLInputElement).files[0];
-    this.form.patchValue({image: file});
+    this.form.patchValue({ image: file });
     this.form.get('image').updateValueAndValidity();
     const reader = new FileReader();
     reader.onload = () => {
       this.imagePreview = reader.result as string;
-    }
+    };
     reader.readAsDataURL(file);
+  }
+  ngOnDestroy() {
+    this.authStatusSub.unsubscribe();
   }
 }
