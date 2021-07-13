@@ -32,9 +32,16 @@ export class AuthService {
       email,
       password,
     };
-    this.http
-      .post('http://localhost:3000/api/user/signup', authData)
-      .subscribe((response) => {});
+    this.http.post('http://localhost:3000/api/user/signup', authData).subscribe(
+      (response) => {
+        console.log(response);
+        this.router.navigate(['/']);
+      },
+      (error) => {
+        console.log(error);
+        this.authStatusListener.next(false);
+      }
+    );
   }
 
   login(email: string, password: string) {
@@ -43,13 +50,11 @@ export class AuthService {
       password,
     };
     this.http
-      .post<{ token: string; expiresIn: number, userId: string }>(
+      .post<{ token: string; expiresIn: number; userId: string }>(
         'http://localhost:3000/api/user/login',
         authData
       )
       .subscribe((response) => {
-
-
         const token = response.token;
         this.token = token;
         if (token) {
@@ -65,6 +70,9 @@ export class AuthService {
           this.saveAuthData(token, expirationDate, this.userId);
           this.router.navigate(['/']);
         }
+      }, (error) => {
+        console.log(error);
+        this.authStatusListener.next(false);
       });
   }
 
@@ -99,14 +107,14 @@ export class AuthService {
     }, duration * 1000);
   }
 
-  private saveAuthData(token: string, expirationDate: Date, userId:string,) {
+  private saveAuthData(token: string, expirationDate: Date, userId: string) {
     localStorage.setItem('token', token);
     localStorage.setItem('userId', userId);
     localStorage.setItem('expiration', expirationDate.toISOString());
   }
   private getAuthData() {
     const token = localStorage.getItem('token');
-    const userId =  localStorage.getItem('userId');
+    const userId = localStorage.getItem('userId');
     const expirationDate = localStorage.getItem('expiration');
     if (!token || !expirationDate) {
       return null;
