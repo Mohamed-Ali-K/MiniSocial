@@ -21,35 +21,37 @@ export class PostListComponent implements OnInit, OnDestroy {
   private postSub!: Subscription;
   userIsAuthenticated = false;
   private authListenerSub: Subscription;
-  constructor(public PostService: PostsService, private authService: AuthService) {}
+  constructor(
+    public PostService: PostsService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.isLoading = true;
     this.PostService.getPosts(this.postPerPage, this.currentPage);
     this.postSub = this.PostService.getPostUpdateListener().subscribe(
-      (postData: {posts: Post[], postCount: number }) => {
+      (postData: { posts: Post[]; postCount: number }) => {
         this.isLoading = false;
         this.posts = postData.posts;
         this.totalPost = postData.postCount;
-        console.log(this.totalPost);
       }
     );
     this.userIsAuthenticated = this.authService.getIsAuth();
     this.authListenerSub = this.authService
-    .getAuthStatusListener()
-    .subscribe((isAuthenticated) => {
-      this.userIsAuthenticated = isAuthenticated;
-    });
+      .getAuthStatusListener()
+      .subscribe((isAuthenticated) => {
+        this.userIsAuthenticated = isAuthenticated;
+      });
   }
   onDelete(postId: string) {
     this.isLoading = true;
-    this.PostService.deletePost(postId).subscribe(() =>{
+    this.PostService.deletePost(postId).subscribe(() => {
       this.PostService.getPosts(this.postPerPage, this.currentPage);
     });
   }
 
   onChangPage(pageData: PageEvent) {
-    this.isLoading= true;
+    this.isLoading = true;
     this.currentPage = pageData.pageIndex + 1;
     this.postPerPage = pageData.pageSize;
     this.PostService.getPosts(this.postPerPage, this.currentPage);
