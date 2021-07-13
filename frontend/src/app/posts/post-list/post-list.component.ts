@@ -13,13 +13,15 @@ import { PostsService } from '../posts.service';
 })
 export class PostListComponent implements OnInit, OnDestroy {
   posts: Post[] = [];
-  isLoading = false;
   totalPost = 0;
   postPerPage = 2;
   currentPage = 1;
   pageSizeOption = [1, 2, 5, 10];
-  private postSub!: Subscription;
+  userId: string;
+  isLoading = false;
+  isCreator= false;
   userIsAuthenticated = false;
+  private postSub!: Subscription;
   private authListenerSub: Subscription;
   constructor(
     public PostService: PostsService,
@@ -29,6 +31,7 @@ export class PostListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.isLoading = true;
     this.PostService.getPosts(this.postPerPage, this.currentPage);
+    this.userId = this.authService.getUserId();
     this.postSub = this.PostService.getPostUpdateListener().subscribe(
       (postData: { posts: Post[]; postCount: number }) => {
         this.isLoading = false;
@@ -36,11 +39,12 @@ export class PostListComponent implements OnInit, OnDestroy {
         this.totalPost = postData.postCount;
       }
     );
-    this.userIsAuthenticated = this.authService.getIsAuth();
+     this.userIsAuthenticated = this.authService.getIsAuth();
     this.authListenerSub = this.authService
       .getAuthStatusListener()
       .subscribe((isAuthenticated) => {
         this.userIsAuthenticated = isAuthenticated;
+        this.userId = this.authService.getUserId();
       });
   }
   onDelete(postId: string) {

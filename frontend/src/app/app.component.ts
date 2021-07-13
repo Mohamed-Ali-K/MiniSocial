@@ -8,8 +8,8 @@ import { Post } from './posts/post.model';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-constructor(private authService: AuthService) {}
-ngOnInit () {
-this.authService.autoAuthUser();
+  constructor(private authService: AuthService) {}
+  ngOnInit() {
+    this.authService.autoAuthUser();
+  }
 }
-

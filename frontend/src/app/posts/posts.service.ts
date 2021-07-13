@@ -36,6 +36,7 @@ export class PostsService {
         })
       )
       .subscribe((transformedPostData) => {
+        console.log(transformedPostData);
 
         this.posts = transformedPostData.post;
         this.postUpdated.next({
@@ -51,6 +52,7 @@ export class PostsService {
       title: string;
       content: string;
       imagePath: string;
+      creator: string;
     }>('http://localhost:3000/api/posts/' + id);
   }
 
@@ -81,7 +83,7 @@ export class PostsService {
       postData.append('content', content);
       postData.append('image', image, title);
     } else {
-      postData = { id, title, content, imagePath: image };
+      postData = { id, title, content, imagePath: image , creator: null};
     }
 
     this.http
