@@ -1,8 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const checkAuth = require("../middleware/check-auth");
-
-const Post = require("../models/post");
+const postControler = require("../controllers/post");
 
 const router = express.Router();
 
@@ -32,124 +31,19 @@ router.post(
   "",
   checkAuth,
   multer({ storage: storage }).single("image"),
-  (req, res, next) => {
-    const url = req.protocol + "://" + req.get("host");
-    const post = new Post({
-      title: req.body.title,
-      content: req.body.content,
-      imagePath: url + "/images/" + req.file.filename,
-      creator: req.UserData.userId,
-    });
-    post
-      .save()
-      .then((createdPost) => {
-        console.log(createdPost);
-        res.status(201).json({
-          message: "Post added sucessfully!",
-          post: {
-            ...createdPost,
-            id: createdPost._id,
-          },
-        });
-      })
-      .catch((error) => {
-        res.status(500).json({
-          message: "Creating a post failed!!",
-        });
-      });
-  }
+  postControler.createPost
 );
-router.delete("/:id", checkAuth, (req, res, next) => {
-  Post.deleteOne({ _id: req.params.id, creator: req.UserData.userId }).then(
-    (result) => {
-      console.log(result);
-      if (result.deletedCount > 0) {
-        res.status(200).json({ message: "Post Deleted!" });
-      } else {
-        res.status(401).json({ message: "Not authorize !" });
-      }
-    }
-  ).catch(error =>{
-    res.status(500).json({
-      message: "Couldn't delete the post!"
-    })
-  });
-});
+router.delete("/:id", checkAuth, postControler.deletePost);
 
 router.put(
   "/:id",
   checkAuth,
   multer({ storage: storage }).single("image"),
-  (req, res, next) => {
-    let imagePath = req.body.imagePath;
-    if (req.file) {
-      const url = req.protocol + "://" + req.get("host");
-      imagePath = url + "/images/" + req.file.filename;
-    }
-    const post = new Post({
-      _id: req.body.id,
-      title: req.body.title,
-      content: req.body.content,
-      imagePath: imagePath,
-      creator: req.UserData.userId,
-    });
-    Post.updateOne({ _id: req.params.id, creator: req.UserData.userId }, post)
-      .then((result) => {
-        console.log(result);
-        if (result.nModified > 0) {
-          res.status(200).json({ message: "Post Updated!" });
-        } else {
-          res.status(401).json({ message: "Not authorized!" });
-        }
-      })
-      .catch((error) => {
-        res.status(500).json({
-          message: "Couldn't update post!",
-        });
-      });
-  }
+  postControler.editPost
 );
 
-router.get("/:id", (req, res, next) => {
-  Post.findById(req.params.id)
-    .then((post) => {
-      if (post) {
-        res.status(200).json(post);
-      } else {
-        res.status(404).json({ message: "Post Not Found!" });
-      }
-    })
-    .catch((error) => {
-      res.status(500).json({
-        message: "Couldn't Featche the post!",
-      });
-    });
-});
-router.get("", (req, res, next) => {
-  const pageSize = +req.query.pagesize;
-  const currentPage = +req.query.page;
-  const postQuery = Post.find();
-  let featchedPost;
-  if (pageSize && currentPage) {
-    postQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
-  }
-  postQuery
-    .then((documents) => {
-      featchedPost = documents;
-      return Post.countDocuments();
-    })
-    .then((count) => {
-      res.status(200).json({
-        message: "Posts featched succesfully!",
-        posts: featchedPost,
-        maxPost: count,
-      });
-    })
-    .catch((error) => {
-      res.status(500).json({
-        message: "Couldn't Featche all posts!",
-      });
-    });
-});
+router.get("/:id", postControler.getPost);
+
+router.get("", postControler.getPosts);
 
 module.exports = router;
