@@ -22,7 +22,7 @@ exports.loginUser = (req, res, next) => {
       }
       const token = jsonwebtoken.sign(
         { email: fetchedUser.email, userId: fetchedUser._id },
-        "secret_this_should_be_longer",
+        process.env.JWT_KEY,
         {
           expiresIn: "1h",
         }
